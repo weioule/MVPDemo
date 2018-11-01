@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MVPDemo</string>
+
+    <string name="ok">确定</string>
+    <string name="no_network">暂无网络</string>
+    <string name="exit_app">再按一次退出程序</string>
+
+</resources>

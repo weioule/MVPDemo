@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FF4081</color>
+    <color name="colorPrimaryDark">#FF4081</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="text_gray">#9B9B9B</color>
+    <!--bottom nav button-->
+    <color name="tab_checked">#FF4081</color>
+    <color name="tab_gray">#9B9B9B</color>
+    <color name="bg_gray">#F6F6F6</color>
+    <color name="tab_unchecked">#D3D3D3</color>
+    <color name="transparent">#00000000</color>
+</resources>
