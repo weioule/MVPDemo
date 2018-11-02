@@ -8,7 +8,7 @@
 
  ![image](https://github.com/weioule/MVPDemo/blob/master/app/img/pic01.jpg)
   &emsp;![image](https://github.com/weioule/MVPDemo/blob/master/app/img/pic02.jpg)
-  <br>ps: 这是闪屏页的广告，进入闪屏页会有3秒钟的加载时间，若数据在3秒内返回并且有广告，则显示广告及倒计时，否则直接进入首页。
+  <br>ps: 这是闪屏页的广告，进入闪屏页会有1.75秒钟的加载时间，若数据在1.75秒内返回并且有广告，则显示广告及倒计时，否则直接进入首页。
   
   
    <br>![image](https://github.com/weioule/MVPDemo/blob/master/app/img/pic03.jpg)
