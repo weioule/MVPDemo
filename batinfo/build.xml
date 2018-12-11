@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project name="ChannelBuilder" default="close">
+	<!-- global environment -->
+	<property environment="env" />
+	<property name="sdk-folder" value="C:\Android\sdk" />
+	<property name="build-tools" value="${sdk-folder}/build-tools/26.0.2" />
+	<property name="aapt" value="${build-tools}/aapt.exe" />
+	<property name="zipalign" value="${build-tools}/zipalign.exe" />
+	<property name="jarsigner" value="C:\Android\jdk\jdk1.8.0_101\bin\jarsigner.exe" />
+	
+	<!-- Project internal dirs  -->
+	
+	
+	<property name="src-dir" value="E:\AndroidPackage"/>
+	<property name="dst-dir" value="E:\AndroidPackage"/>
+	
+	<property name="work-dir" value="${src-dir}\${APKPATH}\${APPVER}" />
+	<property name="out-dir" value="${dst-dir}\${APKPATH}\${APPVER}" />
+	
+	<property name="apk-src" value="${work-dir}\${APKNAME}.apk" />
+	<property name="apk-tmp" value="${work-dir}\tmp.apk" />
+	<property name="apk-out" value="${work-dir}\out.apk" />
+	<property name="apk-dst" value="${out-dir}\${APKNAME}_${UMENG}.apk" />
+	
+	<property name="assets" value="assets" />
+	<property name="umengfile" value="${assets}/umeng" />
+	<property name="cerfdir" value="META-INF" />
+	
+	<!-- For sign  -->
+	<property name="keystore" value="${src-dir}\${APKPATH}\release.keystore" />
+	<property name="keyalias" value="vipwk" />
+	<property name="keypass" value="vipweike" />
+
+	<target name="init">
+		<echo>全局变量</echo>
+		<echo>${apk-src}</echo>
+		<echo>${apk-tmp}</echo>
+		<echo>${apk-dst}</echo>
+		<echo>${build-tools}</echo>
+	</target>
+	
+	<target name="copy" depends="init">
+		<echo>生成工作目录</echo>
+		<mkdir dir="${out-dir}" />
+		<mkdir dir="${assets}" />
+		<delete file="${apk-dst}" />
+		<delete file="${apk-tmp}" />
+		<delete file="${apk-out}" />
+		<delete file="${umengfile}" />
+		<copy file="${apk-src}" tofile="${apk-tmp}" />
+		
+	</target>
+	
+	<target name="channle" depends="copy">
+		<echo>渠道号 :: ${UMENG}</echo>
+		<echo file="${umengfile}">${UMENG}</echo>
+	</target>
+	
+	<target name="apkbuild" depends="channle">
+		<echo>删除渠道文件</echo>
+		<exec executable="${aapt}" failonerror="true">
+			<arg value="remove" />
+			<arg value="${apk-tmp}" />
+			<arg value="${umengfile}" />
+		</exec>
+		<echo>删除签名文件</echo>
+		<exec executable="${aapt}" failonerror="true">
+			<arg value="remove" />
+			<arg value="${apk-tmp}" />
+			<arg value="${cerfdir}/CERT.RSA" />
+			<arg value="${cerfdir}/CERT.SF" />
+			<arg value="${cerfdir}/MANIFEST.MF" />
+		</exec>
+		<echo>添加渠道文件</echo>
+		<exec executable="${aapt}" failonerror="true">
+			<arg value="add" />
+			<arg value="${apk-tmp}" />
+			<arg value="${umengfile}" />
+		</exec>
+	</target>
+  	
+	<target name="jarsigner" depends="apkbuild">
+		<echo>签名生成最后的apk</echo>
+		<exec executable="${jarsigner}" failonerror="true">
+			<arg value="-storepass" />
+			<arg value="${keypass}" />
+			<arg value="-keypass" />
+			<arg value="${keypass}" />
+			<arg value="-keystore" />
+			<arg value="${keystore}" />
+			<arg value="-signedjar" />
+			<arg value="${apk-out}" />
+			<arg value="${apk-tmp}" />
+			<arg value="${keyalias}" />
+			<arg value="-digestalg " />
+			<arg value="SHA1" />
+			<arg value="-sigalg" />
+			<arg value="MD5withRSA" />
+		</exec>
+	</target>
+	
+	<target name="zipalign" depends="jarsigner">
+		<echo>应用ZIPALIGN到签完名的apk上</echo>
+		<exec executable="${zipalign}">
+			<arg value="-f" />
+			<arg value="-v" />
+			<arg value="4" />
+			<arg value="${apk-out}" />
+			<arg value="${apk-dst}" />
+	   </exec>
+	</target>
+
+	<target name="close" depends="zipalign">
+		<echo>DONE</echo>
+	</target>
+</project>
