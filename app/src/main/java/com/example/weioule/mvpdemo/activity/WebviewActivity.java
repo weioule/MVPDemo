@@ -5,10 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -19,21 +16,32 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-
 import com.example.weioule.mvpdemo.R;
+import com.example.weioule.mvpdemo.base.BasePresenter;
+import com.example.weioule.mvpdemo.base.BaseTitleActivity;
+import com.example.weioule.mvpdemo.base.IView;
 
 import java.lang.reflect.Method;
 
-public class WebviewActivity extends AppCompatActivity {
+public class WebviewActivity extends BaseTitleActivity<IView, BasePresenter> {
 
-    private ProgressBar mProgressBar;
     private WebView mWebview;
+    private ProgressBar mProgressBar;
     private String mUrl = "https://www.baidu.com";
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_webview);
+    protected int getLayoutIds() {
+        return R.layout.activity_webview;
+    }
+
+    @Override
+    protected BasePresenter createPresenter() {
+        return null;
+    }
+
+    @Override
+    protected void initViews() {
+        mTitleText.setText("百度一下");
         mWebview = findViewById(R.id.webview);
         mProgressBar = findViewById(R.id.webview_progressbar);
 
@@ -57,6 +65,10 @@ public class WebviewActivity extends AppCompatActivity {
         mWebview.removeJavascriptInterface("accessibilityTraversal");
 
         disableAccessibility(this);
+    }
+
+    @Override
+    protected void initData() {
     }
 
     @Override

@@ -49,6 +49,16 @@ public abstract class BasePresenter<V extends IView, M extends BaseModel> {
         }
     }
 
+    protected void showLoadingDialog() {
+        if (null != getMvpView() && getMvpView() instanceof BaseActivity)
+            ((BaseActivity) getMvpView()).showLodingDialog();
+    }
+
+    protected void hideLoadingDialog() {
+        if (null != getMvpView() && getMvpView() instanceof BaseActivity)
+            ((BaseActivity) getMvpView()).hideLodingDialog();
+    }
+
     public static class MvpViewNotAttachedException extends RuntimeException {
         public MvpViewNotAttachedException() {
             super("Please call Presenter.attachView(MvpView) before requesting data to the Presenter");

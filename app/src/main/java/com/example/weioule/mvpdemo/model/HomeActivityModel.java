@@ -1,9 +1,12 @@
 package com.example.weioule.mvpdemo.model;
 
 
-import com.example.weioule.mvpdemo.base.HttpRequest;
+import android.os.Handler;
+
 import com.example.weioule.mvpdemo.base.BaseModel;
 import com.example.weioule.mvpdemo.base.Callback;
+import com.example.weioule.mvpdemo.base.HttpRequest;
+
 
 /**
  * Author by weioule.
@@ -17,7 +20,12 @@ public class HomeActivityModel extends BaseModel implements HttpRequest.HttpRequ
     }
 
     public void checkVersion() {
-        onSuccess(null);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                onSuccess(null);
+            }
+        }, 1500);
     }
 
     @Override

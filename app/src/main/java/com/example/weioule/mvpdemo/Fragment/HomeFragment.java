@@ -17,14 +17,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.weioule.mvpdemo.R;
-import com.example.weioule.mvpdemo.base.RecyclerViewDivider;
-import com.example.weioule.mvpdemo.widget.TextFooterView;
-import com.example.weioule.mvpdemo.base.BaseFragment;
 import com.example.weioule.mvpdemo.adapter.HomeFragmentAdapter;
+import com.example.weioule.mvpdemo.base.BaseFragment;
+import com.example.weioule.mvpdemo.base.RecyclerViewDivider;
 import com.example.weioule.mvpdemo.bean.HomeDataBean;
-import com.example.weioule.mvpdemo.model.HomeFragmentModel;
 import com.example.weioule.mvpdemo.presenter.HomeFragmentPresenter;
 import com.example.weioule.mvpdemo.view.HomeFragmentMvpView;
+import com.example.weioule.mvpdemo.widget.TextFooterView;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.header.SinaRefreshView;
@@ -37,7 +36,7 @@ import java.util.List;
  * Date on 2018/10/29.
  */
 @SuppressLint("ValidFragment")
-public class HomeFragment extends BaseFragment<HomeFragmentMvpView, HomeFragmentModel, HomeFragmentPresenter> implements HomeFragmentMvpView {
+public class HomeFragment extends BaseFragment<HomeFragmentMvpView, HomeFragmentPresenter> implements HomeFragmentMvpView {
 
     private TwinklingRefreshLayout mRefreshLayout;
     private HomeFragmentAdapter mAdapter;
@@ -51,7 +50,14 @@ public class HomeFragment extends BaseFragment<HomeFragmentMvpView, HomeFragment
     }
 
     @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_home;
+    }
+
+    @Override
     public void initView(@NonNull View rootView, @Nullable Bundle savedInstanceState) {
+        ((TextView) rootView.findViewById(R.id.title)).setText(type);
+
         mRecyclerView = rootView.findViewById(R.id.rv);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.addItemDecoration(new RecyclerViewDivider());
@@ -105,11 +111,6 @@ public class HomeFragment extends BaseFragment<HomeFragmentMvpView, HomeFragment
     }
 
     @Override
-    protected int getLayoutId() {
-        return R.layout.fragment_home;
-    }
-
-    @Override
     protected void onFragmentResume() {
     }
 
@@ -132,6 +133,7 @@ public class HomeFragment extends BaseFragment<HomeFragmentMvpView, HomeFragment
         if (pageNo == 1 && null != mDataBeanList) {
             mDataBeanList.clear();
         }
+
         mAdapter.addAll(result);
         if (pageNo == 1) {
             mRefreshLayout.finishRefreshing();
@@ -156,8 +158,7 @@ public class HomeFragment extends BaseFragment<HomeFragmentMvpView, HomeFragment
     @Override
     public void showEmptyView(String errorMsg) {
         mRefreshLayout.finishRefreshing();
-        showErrorView();
-        mErrorContent.setText(errorMsg);
+        showErrorView(errorMsg);
     }
 
     @Override

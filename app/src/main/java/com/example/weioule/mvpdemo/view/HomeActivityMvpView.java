@@ -10,4 +10,6 @@ import com.example.weioule.mvpdemo.base.IView;
 public interface HomeActivityMvpView extends IView {
 
     void checkVersion(boolean bean);
+
+    void upgrade();
 }

@@ -10,10 +10,8 @@ import android.widget.TextView;
 
 import com.example.weioule.mvpdemo.Fragment.HomeFragment;
 import com.example.weioule.mvpdemo.R;
-import com.example.weioule.mvpdemo.widget.SweetAlertDialog;
 import com.example.weioule.mvpdemo.adapter.HomeActivityAdapter;
 import com.example.weioule.mvpdemo.base.BaseActivity;
-import com.example.weioule.mvpdemo.model.HomeActivityModel;
 import com.example.weioule.mvpdemo.presenter.HomeActivityPresenter;
 import com.example.weioule.mvpdemo.view.HomeActivityMvpView;
 import com.example.weioule.mvpdemo.widget.CustomViewPager;
@@ -27,10 +25,9 @@ import java.util.TimerTask;
  * Author by weioule.
  * Date on 2018/10/29.
  */
-public class HomeActivity extends BaseActivity<HomeActivityMvpView, HomeActivityModel, HomeActivityPresenter> implements HomeActivityMvpView {
+public class HomeActivity extends BaseActivity<HomeActivityMvpView, HomeActivityPresenter> implements HomeActivityMvpView {
 
     private String[] texts = {"主页", "我的"};
-    private SweetAlertDialog mSweetAlertDialog;
     private boolean mBackKeyPressed = false;
     private CustomViewPager mViewPager;
     private TabLayout mTabLayout;
@@ -73,23 +70,17 @@ public class HomeActivity extends BaseActivity<HomeActivityMvpView, HomeActivity
 
     @Override
     public void initData() {
-        mSweetAlertDialog = new SweetAlertDialog(this);
-        mSweetAlertDialog.show();
-
-        mTabLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mPresenter.checkVersion();
-            }
-        }, 1500);
+        mPresenter.checkVersion();
     }
 
     @Override
     public void checkVersion(boolean msg) {
-        if (mSweetAlertDialog != null && mSweetAlertDialog.isShowing()) {
-            mSweetAlertDialog.dismiss();
-        }
         mPresenter.showUpdateDialog(this);
+    }
+
+    @Override
+    public void upgrade() {
+        forward(WebviewActivity.class);
     }
 
     private void changeTabStatus(TabLayout.Tab tab, boolean selected) {

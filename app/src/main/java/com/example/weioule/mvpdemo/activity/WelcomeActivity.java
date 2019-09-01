@@ -9,7 +9,6 @@ import android.widget.RelativeLayout;
 
 import com.example.weioule.mvpdemo.R;
 import com.example.weioule.mvpdemo.base.BaseActivity;
-import com.example.weioule.mvpdemo.model.WelcomeModel;
 import com.example.weioule.mvpdemo.presenter.WelcomePresenter;
 import com.example.weioule.mvpdemo.view.WelcomeMvpView;
 import com.example.weioule.mvpdemo.widget.ProgressView;
@@ -19,7 +18,7 @@ import com.example.weioule.mvpdemo.widget.ProgressView;
  * Author by weioule.
  * Date on 2018/10/29.
  */
-public class WelcomeActivity extends BaseActivity<WelcomeMvpView, WelcomeModel, WelcomePresenter> implements WelcomeMvpView, View.OnClickListener {
+public class WelcomeActivity extends BaseActivity<WelcomeMvpView, WelcomePresenter> implements WelcomeMvpView, View.OnClickListener {
 
     private ImageView mBannerImg;
     private int AD_DISPLAY_TIME = 1750;

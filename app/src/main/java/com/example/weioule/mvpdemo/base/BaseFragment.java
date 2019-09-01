@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -28,7 +29,7 @@ import com.example.weioule.mvpdemo.R;
  * Author by weioule.
  * Date on 2018/10/29.
  */
-public abstract class BaseFragment<V extends IView, M extends BaseModel, P extends BasePresenter<V, M>> extends Fragment {
+public abstract class BaseFragment<V extends IView, P extends BasePresenter> extends Fragment {
 
     private boolean isFirstUserHint = true;
     protected FragmentActivity mActivity;
@@ -47,7 +48,8 @@ public abstract class BaseFragment<V extends IView, M extends BaseModel, P exten
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setRetainInstance(true);
         mPresenter = createPresenter();
-        mPresenter.attachView((V) this);
+        if (null != mPresenter)
+            mPresenter.attachView((V) this);
         super.onCreate(savedInstanceState);
     }
 
@@ -77,6 +79,11 @@ public abstract class BaseFragment<V extends IView, M extends BaseModel, P exten
         initData(savedInstanceState);
     }
 
+    /**
+     * 这里需要注意：
+     * 当HomActivity的Adapter已经添加过改Fragment了，然后网络错误再重新加载数据时的initView()布局初始化中，重新添加该Fragment时，
+     * 是不会再重新走它的完整的生命周期方法，而是走onCreate()之后直接走了这里的显示方法，其他生命周期方法将不再执行
+     */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if (isFirstUserHint) {
@@ -116,11 +123,18 @@ public abstract class BaseFragment<V extends IView, M extends BaseModel, P exten
     private void doFragmentResume() {
     }
 
-    protected void showErrorView() {
+    protected void showErrorView(String errorMsg) {
         mErrorView = LayoutInflater.from(mActivity).inflate(R.layout.view_net_error, null, false);
         rootFragmentView.addView(mErrorView);
         mErrorRl = mErrorView.findViewById(R.id.rl_net_error);
         mErrorContent = mErrorView.findViewById(R.id.content_error);
+        if (!TextUtils.isEmpty(errorMsg)) {
+            mErrorContent.setText(errorMsg);
+        } else if (isNetworkAvailable(getContext())) {
+            mErrorContent.setText(getString(R.string.net_error));
+        } else {
+            mErrorContent.setText(getString(R.string.no_net_error));
+        }
         mErrorRl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,7 +155,8 @@ public abstract class BaseFragment<V extends IView, M extends BaseModel, P exten
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mPresenter.detachView();
+        if (null != mPresenter)
+            mPresenter.detachView();
     }
 
     protected abstract P createPresenter();

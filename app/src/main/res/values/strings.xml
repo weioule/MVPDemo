@@ -2,7 +2,12 @@
     <string name="app_name">MVPDemo</string>
 
     <string name="ok">确定</string>
+    <string name="error">出错了</string>
     <string name="no_network">暂无网络</string>
+    <string name="please_wait">请稍候...</string>
     <string name="exit_app">再按一次退出程序</string>
+
+    <string name="net_error">网络异常，请检查网络设置后\n点击空白处刷新</string>
+    <string name="no_net_error">网络不给力，请检查网络设置后\n点击空白处刷新</string>
 
 </resources>

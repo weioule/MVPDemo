@@ -8,30 +8,37 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.weioule.mvpdemo.R;
+import com.example.weioule.mvpdemo.widget.SweetAlertDialog;
 
 
 /**
  * Author by weioule.
  * Date on 2018/10/29.
  */
-public abstract class BaseActivity<V extends IView, M extends BaseModel, P extends BasePresenter<V, M>> extends AppCompatActivity {
+public abstract class BaseActivity<V extends IView, P extends BasePresenter> extends AppCompatActivity {
 
     protected P mPresenter;
+    protected ImageView mErrorImg;
     protected TextView mErrorContent;
     protected RelativeLayout mErrorRl;
+    private SweetAlertDialog mSweetAlertDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = createPresenter();
-        mPresenter.attachView((V) this);
+        if (null != mPresenter)
+            mPresenter.attachView((V) this);
         setContentView(getLayoutId());
         initView();
         initData();
@@ -66,16 +73,45 @@ public abstract class BaseActivity<V extends IView, M extends BaseModel, P exten
 
     @Override
     protected void onDestroy() {
-        mPresenter.detachView();
-        mPresenter = null;
+        if (null != mPresenter) {
+            mPresenter.detachView();
+            mPresenter = null;
+        }
         super.onDestroy();
     }
 
-    protected void showErrorView() {
-        View view = LayoutInflater.from(this).inflate(R.layout.view_net_error, null, false);
-        setContentView(view);
+    public void showErrorView() {
+        showErrorView(null, null);
+    }
+
+    public void showErrorView(String errorMsg) {
+        showErrorView(null, errorMsg);
+    }
+
+    public void showErrorView(TextView titleText, String errorMsg) {
+        hideLodingDialog();
+        if (null != titleText) {
+            if (TextUtils.isEmpty(errorMsg)) {
+                titleText.setText(getString(R.string.no_network));
+            } else {
+                titleText.setText(getString(R.string.error));
+            }
+            LayoutInflater.from(this).inflate(R.layout.view_net_error, (ViewGroup) findViewById(R.id.container), true);
+        } else {
+            View view = LayoutInflater.from(this).inflate(R.layout.view_net_error, null, false);
+            setContentView(view);
+        }
+
         mErrorRl = findViewById(R.id.rl_net_error);
+        mErrorImg = findViewById(R.id.iv_error);
         mErrorContent = findViewById(R.id.content_error);
+        if (!TextUtils.isEmpty(errorMsg)) {
+            mErrorContent.setText(errorMsg);
+        } else if (isNetworkAvailable(this)) {
+            mErrorContent.setText(getString(R.string.net_error));
+        } else {
+            mErrorContent.setText(getString(R.string.no_net_error));
+        }
         mErrorRl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,6 +122,25 @@ public abstract class BaseActivity<V extends IView, M extends BaseModel, P exten
                 }
             }
         });
+    }
+
+    public void showLodingDialog() {
+        showLodingDialog(getString(R.string.please_wait));
+    }
+
+    public void showLodingDialog(String txt) {
+        if (null == mSweetAlertDialog)
+            mSweetAlertDialog = new SweetAlertDialog(this);
+        if (!TextUtils.isEmpty(txt)) {
+            mSweetAlertDialog.setTitleText(txt);
+        }
+        mSweetAlertDialog.show();
+    }
+
+    public void hideLodingDialog() {
+        if (mSweetAlertDialog != null && mSweetAlertDialog.isShowing()) {
+            mSweetAlertDialog.dismiss();
+        }
     }
 
     protected void hideErrorView() {
@@ -116,7 +171,11 @@ public abstract class BaseActivity<V extends IView, M extends BaseModel, P exten
     }
 
     protected void forward(Class<?> cls) {
-        startActivity(new Intent(this, cls));
+        forward(new Intent(this, cls));
+    }
+
+    protected void forward(Intent intent) {
+        startActivity(intent);
     }
 
     /**

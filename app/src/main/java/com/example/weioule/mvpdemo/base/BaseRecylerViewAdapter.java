@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.example.weioule.mvpdemo.uitls.LogUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  */
 public abstract class BaseRecylerViewAdapter<E> extends RecyclerView.Adapter<BaseViewHolder> {
 
+    private static final String TAG = "BaseRecylerViewAdapter";
     protected static final int FOOTER_VIEW = 0x00000111;
     protected static final int HEADER_VIEW = 0x00000112;
 
@@ -106,9 +109,15 @@ public abstract class BaseRecylerViewAdapter<E> extends RecyclerView.Adapter<Bas
                 break;
             default:
                 if (mDataLists != null && mDataLists.size() > 0) {
-                    E e = mDataLists.get(position - getHeaderLayoutCount());
+                    int realityPosition = viewHolder.getLayoutPosition() - getHeaderLayoutCount();
+                    if (realityPosition >= mDataLists.size() || realityPosition < 0) {
+                        LogUtil.e(TAG, " ******* onBindViewHolder() 数组越界异常！！！！");
+                        return;
+                    }
+                    E e = mDataLists.get(realityPosition);
                     if (null != e) {
-                        bindData(viewHolder, e, position);
+                        //注意：此时的position是adpater的索引，它比mDataLists的索引大getHeaderLayoutCount(),在bindData()里使用mDataLists的索引时要减去getHeaderLayoutCount()
+                        bindData(viewHolder, e, viewHolder.getLayoutPosition());
                     }
                 }
                 break;
@@ -207,16 +216,19 @@ public abstract class BaseRecylerViewAdapter<E> extends RecyclerView.Adapter<Bas
             mHeaderLayout = new LinearLayout(header.getContext());
             if (orientation == LinearLayout.VERTICAL) {
                 mHeaderLayout.setOrientation(LinearLayout.VERTICAL);
-                mHeaderLayout.setLayoutParams(new RecyclerView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+                mHeaderLayout.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
             } else {
                 mHeaderLayout.setOrientation(LinearLayout.HORIZONTAL);
-                mHeaderLayout.setLayoutParams(new RecyclerView.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
+                mHeaderLayout.setLayoutParams(new ViewGroup.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
             }
         }
         final int childCount = mHeaderLayout.getChildCount();
         if (index < 0 || index > childCount) {
             index = childCount;
         }
+        View childAt = mHeaderLayout.getChildAt(index);
+        if (null != childAt)
+            mHeaderLayout.removeView(childAt);
         mHeaderLayout.addView(header, index);
         if (mHeaderLayout.getChildCount() == 1) {
             notifyItemInserted(getHeaderViewPosition());
@@ -246,6 +258,16 @@ public abstract class BaseRecylerViewAdapter<E> extends RecyclerView.Adapter<Bas
         if (getHeaderLayoutCount() == 0 || mHeaderLayout.getChildCount() <= 0) return;
 
         mHeaderLayout.removeView(header);
+        if (mHeaderLayout.getChildCount() <= 0) {
+            notifyItemRemoved(getHeaderViewPosition());
+        }
+    }
+
+    public void removeHeaderView(int index) {
+        if (getHeaderLayoutCount() == 0 || mHeaderLayout.getChildCount() <= 0) return;
+
+        if (null != mHeaderLayout.getChildAt(index))
+            mHeaderLayout.removeView(mHeaderLayout.getChildAt(index));
         if (mHeaderLayout.getChildCount() <= 0) {
             notifyItemRemoved(getHeaderViewPosition());
         }
@@ -286,16 +308,19 @@ public abstract class BaseRecylerViewAdapter<E> extends RecyclerView.Adapter<Bas
             mFooterLayout = new LinearLayout(footer.getContext());
             if (orientation == LinearLayout.VERTICAL) {
                 mFooterLayout.setOrientation(LinearLayout.VERTICAL);
-                mFooterLayout.setLayoutParams(new RecyclerView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+                mFooterLayout.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
             } else {
                 mFooterLayout.setOrientation(LinearLayout.HORIZONTAL);
-                mFooterLayout.setLayoutParams(new RecyclerView.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
+                mFooterLayout.setLayoutParams(new ViewGroup.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
             }
         }
         final int childCount = mFooterLayout.getChildCount();
         if (index < 0 || index > childCount) {
             index = childCount;
         }
+        View childAt = mFooterLayout.getChildAt(index);
+        if (null != childAt)
+            mFooterLayout.removeView(childAt);
         mFooterLayout.addView(footer, index);
         if (mFooterLayout.getChildCount() == 1) {
             notifyItemInserted(getFooterViewPosition());
